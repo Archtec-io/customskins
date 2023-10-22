@@ -1,0 +1,12 @@
+# textdomain: customskins
+Template=
+Skin=
+Shoes=
+Face=
+Legs=
+Body 1=
+Body 2=
+Hair=
+Miscellaneous=
+Open skin configuration screen=
+Select=

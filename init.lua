@@ -59,7 +59,7 @@ minetest.register_chatcommand("skin", {
 
 function customskins.compile_skin(skin)
 	local output = ""
-	for i, item in pairs(customskins.item_names) do
+	for _, item in pairs(customskins.item_names) do
 		local texture = skin[item]
 		if texture and texture ~= "blank.png" then
 			if #output > 0 then output = output .. "^" end
@@ -171,11 +171,11 @@ function customskins.show_formspec(player, active_tab, page_num)
 			local preview = "customskins_mask.png" .. "^[colorize:gray^" .. skin.base
 			preview = preview .. "^" .. texture
 
-			local mesh = "customskins_head.obj"
+			local objmesh = "customskins_head.obj"
 			if active_tab == "bodyA" or active_tab == "bodyB" then
-				mesh = "customskins_top.obj"
+				objmesh = "customskins_top.obj"
 			elseif active_tab == "legs" or active_tab == "shoes" then
-				mesh = "customskins_bottom.obj"
+				objmesh = "customskins_bottom.obj"
 			end
 
 			local rot_x = -10
@@ -190,7 +190,7 @@ function customskins.show_formspec(player, active_tab, page_num)
 			local y = 0.3 + math.floor(i / 4) * 1.6
 			formspec = formspec ..
 				"model[" .. x .. "," .. y ..
-				";1.5,1.5;" .. mesh .. ";" .. mesh .. ";" ..
+				";1.5,1.5;" .. objmesh .. ";" .. objmesh .. ";" ..
 				preview ..
 				";" .. rot_x .. "," .. rot_y .. ";false;false;0,0]"
 
@@ -252,7 +252,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		return true
 	end
 
-	for i, tab in pairs(customskins.tab_names) do
+	for _, tab in pairs(customskins.tab_names) do
 		if fields[tab] then
 			customskins.show_formspec(player, tab, page_num)
 			return true
@@ -282,7 +282,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 	-- See if field is a texture
 	if field and customskins[active_tab] then
-		for i, texture in pairs(customskins[active_tab]) do
+		for _, texture in pairs(customskins[active_tab]) do
 			if texture == field then
 				skin[active_tab] = texture
 				customskins.update_player_skin(player)

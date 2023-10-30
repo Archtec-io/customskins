@@ -87,8 +87,7 @@ function customskins.update_player_skin(player)
 	end
 end
 
--- Load player skin on join
-minetest.register_on_joinplayer(function(player)
+function customskins.load(player)
 	local skin = player:get_meta():get_string("customskins:skin")
 	if skin then
 		skin = minetest.deserialize(skin)
@@ -99,6 +98,13 @@ minetest.register_on_joinplayer(function(player)
 		skin = table.copy(customskins.sam)
 		customskins.players[player] = skin
 		customskins.save(player)
+	end
+end
+
+-- Load player skin on join
+minetest.register_on_joinplayer(function(player)
+	if not customskins.players[player] then
+		customskins.load(player)
 	end
 
 	player:get_inventory():set_size("hand", 1)
@@ -312,7 +318,11 @@ local function init()
 
 	if armor.get_player_skin then
 		armor.get_player_skin = function(armor, name)
-			return customskins.compile_skin(customskins.players[minetest.get_player_by_name(name)])
+			local player = minetest.get_player_by_name(name)
+			if not customskins.players[player] then
+				customskins.load(player)
+			end
+			return customskins.compile_skin(customskins.players[player])
 		end
 	end
 

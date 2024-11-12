@@ -1,7 +1,7 @@
 unused_args = false
 
 read_globals = {
-	"minetest",
+	"core",
 	"player_api",
 	"unified_inventory",
 	"table"

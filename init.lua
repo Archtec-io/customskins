@@ -1,6 +1,6 @@
 -- Custom Skins mod (based on https://github.com/MrRar/edit_skin)
 
-local S = minetest.get_translator("customskins")
+local S = core.get_translator("customskins")
 
 customskins = {
 	item_names = {"base", "face", "legs", "bodyA", "bodyB", "hair", "shoes", "misc"}, -- Rendering order
@@ -46,16 +46,8 @@ function customskins.save(player)
 	if not player:is_player() then return end
 	local skin = customskins.players[player]
 	if not skin then return end
-	player:get_meta():set_string("customskins:skin", minetest.serialize(skin))
+	player:get_meta():set_string("customskins:skin", core.serialize(skin))
 end
-
---[[
-minetest.register_chatcommand("skin", {
-	description = S("Open skin configuration screen."),
-	privs = {},
-	func = function(name) customskins.show_formspec(minetest.get_player_by_name(name)) end
-})
-]]--
 
 function customskins.compile_skin(skin)
 	local output = ""
@@ -90,7 +82,7 @@ end
 function customskins.load(player)
 	local skin = player:get_meta():get_string("customskins:skin")
 	if skin then
-		skin = minetest.deserialize(skin)
+		skin = core.deserialize(skin)
 	end
 	if skin then
 		customskins.players[player] = skin
@@ -102,7 +94,7 @@ function customskins.load(player)
 end
 
 -- Load player skin on join
-minetest.register_on_joinplayer(function(player)
+core.register_on_joinplayer(function(player)
 	if not customskins.players[player] then
 		customskins.load(player)
 	end
@@ -111,7 +103,7 @@ minetest.register_on_joinplayer(function(player)
 	customskins.update_player_skin(player)
 end)
 
-minetest.register_on_leaveplayer(function(player)
+core.register_on_leaveplayer(function(player)
 	player:get_inventory():set_size("hand", 0)
 	customskins.players[player] = nil
 end)
@@ -225,10 +217,10 @@ function customskins.show_formspec(player, active_tab, page_num)
 			"label[6.3,7.2;" .. page_num .. " / " .. page_count .. "]"
 	end
 
-	minetest.show_formspec(player:get_player_name(), "customskins:" .. active_tab .. "_" .. page_num, formspec)
+	core.show_formspec(player:get_player_name(), "customskins:" .. active_tab .. "_" .. page_num, formspec)
 end
 
-minetest.register_on_player_receive_fields(function(player, formname, fields)
+core.register_on_player_receive_fields(function(player, formname, fields)
 	if not formname:find("^customskins:") then return false end
 	local _, _, active_tab, page_num = formname:find("^customskins:(%a+)_(%d+)")
 	if not page_num or not active_tab then return true end
@@ -302,13 +294,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 local function init()
-	customskins.modpath = minetest.get_modpath("customskins")
+	customskins.modpath = core.get_modpath("customskins")
 
 	local f = io.open(customskins.modpath .. "/list.json")
 	assert(f, "Can't open the file list.json")
 	local data = f:read("*all")
 	assert(data, "Can't read data from list.json")
-	local json, error = minetest.parse_json(data)
+	local json, error = core.parse_json(data)
 	assert(json, error)
 	f:close()
 
@@ -318,7 +310,7 @@ local function init()
 
 	if armor.get_player_skin then
 		armor.get_player_skin = function(armor, name)
-			local player = minetest.get_player_by_name(name)
+			local player = core.get_player_by_name(name)
 			if not customskins.players[player] then
 				customskins.load(player)
 			end
@@ -328,7 +320,7 @@ local function init()
 
 	for _, base in pairs(customskins.base) do
 		local id = base:gsub(".png$", "")
-		minetest.register_node("customskins:" .. id, {
+		core.register_node("customskins:" .. id, {
 			drawtype = "mesh",
 			groups = {not_in_creative_inventory = 1},
 			tiles = {base},
@@ -340,7 +332,7 @@ local function init()
 		})
 	end
 
-	if minetest.global_exists("unified_inventory") then
+	if core.global_exists("unified_inventory") then
 		unified_inventory.register_button("customskins", {
 			type = "image",
 			image = "customskins_skin_button.png",
